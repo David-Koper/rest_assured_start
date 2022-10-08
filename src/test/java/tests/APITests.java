@@ -13,7 +13,7 @@ import static io.restassured.RestAssured.given;
 
 public class APITests extends Specifications {
 
-    @DisplayName("Request validation GET LIST USERS and attribute per_page")
+    @DisplayName("Request validation GET LIST USERS and attribute per_page, page, total")
     @Test
     void checkListUserAttributePerPage() {
         Specifications.installSpecification(Specifications.requestSpecBaseSettings(), Specifications.responseSpecStatus200());
