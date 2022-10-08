@@ -25,7 +25,11 @@ public class APITests extends Specifications {
                 .extract().response();
         JsonPath jsonPath = response.jsonPath();
         Integer per_page = jsonPath.get("per_page");
+        Integer page = jsonPath.get("page");
+        Integer total = jsonPath.get("total");
         Assertions.assertEquals(6, per_page);
+        Assertions.assertEquals(2, page);
+        Assertions.assertEquals(12, total);
     }
 
     @Test
@@ -63,6 +67,72 @@ public class APITests extends Specifications {
         JsonPath jsonPath = response.jsonPath();
         String error = jsonPath.get("error");
         Assertions.assertEquals("Missing password", error);
+    }
+
+    @Test
+    @DisplayName("Check create of user")
+    public void createUserTest() {
+        Specifications.installSpecification(Specifications.requestSpecBaseSettings(), Specifications.responseSpecStatus201());
+        Map<String, String> user = new HashMap<>();
+        user.put("name", "morpheus");
+        user.put("job", "leader");
+        Response response =
+                given()
+                        .body(user)
+                        .post("/api/users")
+                        .then()
+                        .extract().response();
+        JsonPath jsonPath = response.jsonPath();
+        String name = jsonPath.get("name");
+        String job = jsonPath.get("job");
+        Assertions.assertEquals("morpheus", name);
+        Assertions.assertEquals("leader", job);
+    }
+
+    @Test
+    @DisplayName("Check deletion of user")
+    public void deleteUserTest() {
+        Specifications.installSpecification(Specifications.requestSpecBaseSettings(), Specifications.responseSpecUniqueStatus(204));
+        given()
+                .when()
+                .delete("api/users/2")
+                .then();
+    }
+
+    @Test
+    @DisplayName("Check update of user")
+    public void updateUserTest() {
+        Specifications.installSpecification(Specifications.requestSpecBaseSettings(), Specifications.responseSpecStatus200());
+        Map<String, String> user = new HashMap<>();
+        user.put("name", "morpheus");
+        user.put("job", "zion resident");
+        Response response =
+                given()
+                        .body(user)
+                        .patch("/api/users/2")
+                        .then()
+                        .extract().response();
+        JsonPath jsonPath = response.jsonPath();
+        String name = jsonPath.get("name");
+        String job = jsonPath.get("job");
+        Assertions.assertEquals("morpheus", name);
+        Assertions.assertEquals("zion resident", job);
+    }
+
+    @Test
+    @DisplayName("Check error update of user")
+    public void errorUpdateUserTest() {
+        Specifications.installSpecification(Specifications.requestSpecBaseSettings(), Specifications.responseSpecUniqueStatus(404));
+        Map<String, String> user = new HashMap<>();
+        user.put("name", "morpheus");
+        user.put("job", "zion resident");
+        Response response =
+                given()
+                        .body(user)
+                        .patch("/api/users")
+                        .then()
+                        .extract().response();
+
     }
 }
 
